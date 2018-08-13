@@ -1,5 +1,5 @@
 *** Settings ***
-Library           ../ExcellentLibrary.py
+Library           ../ExcellentLibrary/ExcellentLibrary.py
 Library           OperatingSystem
 Library           Collections
 # Test Setup        Setup test
@@ -15,7 +15,7 @@ ${WORKBOOK DUMMY FILENAME}          New Book.xslx
 
 
 *** Test Cases ***
-Opening workbook without alias (defaulting to filepath)
+Opening workbook without alias (defaulting to file_path)
     Open workbook  ${PROPER EXCEL FILE}
     Switch workbook  ${PROPER EXCEL FILE}
     Close workbook  ${PROPER EXCEL FILE}

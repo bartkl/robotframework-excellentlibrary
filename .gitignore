@@ -1,1 +1,4 @@
 *.pyc
+build/
+dist/
+robotframework_excellentlibrary.egg-info/

@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="robotframework-excellentlibrary",
-    version="0.8.4",
+    version="0.9",
     author="Bart Kleijngeld",
     author_email="bartkl@gmail.com",
     description="A really useful Robot Framework library for working with Excel 2010 (and above) files.",

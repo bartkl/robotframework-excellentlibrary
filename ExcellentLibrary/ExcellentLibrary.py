@@ -19,20 +19,20 @@ class AliasAlreadyInUseException(ExcellentLibraryException):
 
 
 class ExcelFileNotFoundException(ExcellentLibraryException):
-    def __init__(self, filepath):
-        self.message = "file `{}' does not exist.".format(filepath)
+    def __init__(self, file_path):
+        self.message = "file `{}' does not exist.".format(file_path)
 
 
 class FileAlreadyExists(ExcellentLibraryException):
-    def __init__(self, filepath):
-        self.message = "The file `{0}' already exists.".format(filepath)
+    def __init__(self, file_path):
+        self.message = "The file `{0}' already exists.".format(file_path)
 
 
 class FileAlreadyOpened(ExcellentLibraryException):
-    def __init__(self, filepath, alias):
-        self.message = ("The workbook with filepath `{0}' is already opened "
+    def __init__(self, file_path, alias):
+        self.message = ("The workbook with file_path `{0}' is already opened "
                        "with alias `{1}'.")\
-                       .format(filepath, alias)
+                       .format(file_path, alias)
 
 
 class InvalidCellCoordinatesException(ExcellentLibraryException):
@@ -86,7 +86,7 @@ class ExcellentLibrary:
 
     == Workbooks ==
     === Opening and switching ===
-    To open an Excel file (workbook), use `Open workbook` . You can open
+    To open an Excel file (workbook), use `Open workbook`. You can open
     several workbooks simultaneously, between which you can switch with
     `Switch workbook`. For example:
 
@@ -124,7 +124,7 @@ class ExcellentLibrary:
     == Sheets ==
 
     === Switching between them ===
-    You can switch between sheets by identifying them by their name as following:
+    You can switch between sheets by identifying them by their name as follows:
 
     | Switch sheet      |  Orders  |  # Acts on active workbook. |
 
@@ -153,13 +153,13 @@ class ExcellentLibrary:
     == Data ==
     === Reading and identifying a cell ===
     Several keywords, including `Write To Cell` and `Read From Cell` require
-    you to identify the cell with which you wish to interact. Basically there
+    you to identify the cell with which you wish to interact. Basically, there
     are two ways to choose from:
     - _A1 notation_, provided through the ``cell`` parameter.\
     This is the well-known shorthand notation which numbers\
     the columns _A_, _B_, _C_, ... and the rows 1, 2, 3, ...\
     For example, _B4_ will refer to row 4, column 2.
-    - _Row/column coordinates__, provided through the ``row_nr`` and\
+    - __Row/column coordinates__, provided through the ``row_nr`` and\
     ``col_nr`` parameters.\
     This is exactly what you'd expect: the row and column numbers\
     (starting from 1) of the cell you want to interact with.
@@ -177,15 +177,15 @@ class ExcellentLibrary:
     | Write To Cell | Hello          | cell=D1  | row_nr=1 | col_nr=4 | # Bad |
 
     If desired one can trim the surrounding whitespace of a cell value by
-    passing ``trim=${TRUE}``. By default no trimming is applied.
+    passing ``trim=${TRUE}``. By default, no trimming is applied.
 
     === Writing data to sheets ===
-    To write plain text data to a cell, the following straight-forward use of
+    To write plaintext data to a cell, the following straight-forward use of
     `Write To Cell` keyword will do:
 
     | Write To Cell | Hello   | B1       | # OK |
 
-    See *Identiying a cell* for more information on cell identification. Here
+    See *Identifying a cell* for more information on cell identification. Here
     I will stick with the A1 notation.
 
     It is possible to format the cell using the ``number_format`` parameter.
@@ -193,8 +193,8 @@ class ExcellentLibrary:
     make sure that the data type of the latter is compatible with what the
     number formatting expects. For example, to format a cell as a number
     that's rounded to two decimals, one should write data of a type number. To
-    format a cell to hold a datetime value, a Python datetime object should be
-    passed in for it to function.
+    format a cell to hold a date-time value, a Python date-time object should 
+    be passed in for it to function.
 
     Some examples:
     | Write To Cell | Hello      | B1 |                           | # OK  |
@@ -208,7 +208,7 @@ class ExcellentLibrary:
 
     _NOTE_: The ``numer_format`` parameter seems to assume the US locale, so
     make sure to delimit numbers with dots ("."), and format your dates using
-    ``yyyy`` for example rather than ``jjjj`` (Dutch). Excel will honor your
+    ``yyyy`` for example rather than ``jjjj`` (Dutch). Excel will honour your
     own locale settings anyways, so don't worry about it.
 
     The OpenPyXL documentation is quite immature, so if you really need to
@@ -228,7 +228,7 @@ class ExcellentLibrary:
     in Robot Framework.
 
     _@TODO_: The ``Workbook`` object has a ``guess_types`` boolean which can
-    be used to manipulate this data type inferring behavior when reading
+    be used to manipulate this datatype inferring behaviour when reading
     cells. This should be looked into.
 
     === Reading the entire sheet ===
@@ -276,7 +276,7 @@ class ExcellentLibrary:
     """
 
 
-    __version__ = '0.8.4'
+    __version__ = '0.9'
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 
     def __init__(self):
@@ -284,34 +284,34 @@ class ExcellentLibrary:
         self.active_workbook_alias = None
         self.active_workbook = None
 
-    def _add_to_workbooks(self, filepath, workbook, alias=None):
+    def _add_to_workbooks(self, file_path, workbook, alias=None):
         """Adds the specified workbook to the opened workbooks dictionary. The
         supplied alias will be used as the key for the dictionary entry. This 
-        defaults to the filepath in case no alias is given. The values in this
-        dictionary are dictionaries themselves, holding the filepath and the
+        defaults to the file_path in case no alias is given. The values in this
+        dictionary are dictionaries themselves, holding the file_path and the
         OpenPyXL Workbook object.
         """
         if not alias:
-            alias = filepath  # Setting the default.
+            alias = file_path  # Setting the default.
 
         if alias in self.workbooks.keys():
             raise AliasAlreadyInUseException(alias)
 
         for workbook_entry in self.workbooks.values()   :
-            if filepath == workbook_entry["filepath"]:
-                existing_alias = self._get_alias_of_workbook_by_filepath(filepath)
-                raise FileAlreadyOpened(filepath, existing_alias)
+            if file_path == workbook_entry["file_path"]:
+                existing_alias = self._get_alias_of_workbook_by_file_path(file_path)
+                raise FileAlreadyOpened(file_path, existing_alias)
 
-        self.workbooks[alias] = {"filepath": filepath,
+        self.workbooks[alias] = {"file_path": file_path,
                                  "workbook": workbook}
         self._set_new_active_workbook(alias)
 
-    def _get_alias_of_workbook_by_filepath(self, filepath):
+    def _get_alias_of_workbook_by_file_path(self, file_path):
         """Gets the alias of supplied workbook. Only supports opened
         workbooks.
         """
         for alias, workbook_entry in self.workbooks.iteritems():
-            if workbook_entry["filepath"] == filepath:
+            if workbook_entry["file_path"] == file_path:
                 return alias
 
     def _get_column_names_from_header_row(self, sheet):
@@ -418,23 +418,23 @@ class ExcellentLibrary:
         else:
             raise SheetExistsAlreadyException(name)
 
-    def create_workbook(self, filepath, overwrite_file_if_exists=False, alias=None):
+    def create_workbook(self, file_path, overwrite_file_if_exists=False, alias=None):
         """Creates a new workbook and saves it to disk.
         It will then also be considered opened, i.e. it will be added to the
         internal dictionary of opened workbooks.
 
-        The ``filepath`` must be supplied.
+        The ``file_path`` must be supplied.
         _NOTE_: It is advised to supply an absolute path to avoid confusion
         regarding what the current working directory is.
         """
         workbook = openpyxl.Workbook()
-        if os.path.isfile(filepath) and not overwrite_file_if_exists:
-            raise FileAlreadyExists(filepath)
+        if os.path.isfile(file_path) and not overwrite_file_if_exists:
+            raise FileAlreadyExists(file_path)
         else:
-            workbook.save(filepath)
+            workbook.save(file_path)
 
         # Add it to the opened workbooks dictionary.
-        self._add_to_workbooks(filepath, workbook, alias=alias)
+        self._add_to_workbooks(file_path, workbook, alias=alias)
 
     def get_column_count(self):
         """Returns the number of non-empty columns in the active sheet.
@@ -458,7 +458,7 @@ class ExcellentLibrary:
         """Returns an iterator for looping over the rows in the active sheet.
 
         This won't be needed often and it is advised to avoid this as much as
-        possible, since it unfriendly to read and hacky in its use with
+        possible, since it is unfriendly to read and hacky in its use with
         respect to Robot Framework.
         """
         sheet = self.active_workbook.active
@@ -469,7 +469,7 @@ class ExcellentLibrary:
         """
         logger.info(self.workbooks)
 
-    def open_workbook(self, filepath, alias=None):
+    def open_workbook(self, file_path, alias=None):
         """Opens an Excel workbook.
 
         Once a workbook is opened, one can work with it, i.e. manipulate data
@@ -477,9 +477,9 @@ class ExcellentLibrary:
 
         Also, once opened, a workbook (technically, the file handle) is added
         to an internal dictionary. This way you can have several workbooks
-        open simultaneously, swtiching between them when desired.
+        open simultaneously, switching between them when desired.
 
-        The ``filepath`` parameter should point to the location of the file on
+        The ``file_path`` parameter should point to the location of the file on
         the filesystem. It is advisable to make this an absolute path to avoid
         confusion.
 
@@ -490,13 +490,13 @@ class ExcellentLibrary:
 
         """
         try:
-            workbook = openpyxl.load_workbook(filepath)
+            workbook = openpyxl.load_workbook(file_path)
         except IOError as e:
             if e.errno == errno.ENOENT:
-                raise ExcelFileNotFoundException(filepath)
+                raise ExcelFileNotFoundException(file_path)
             else:
                 raise e
-        self._add_to_workbooks(filepath, workbook, alias=alias)
+        self._add_to_workbooks(file_path, workbook, alias=alias)
 
     def read_from_cell(self,
                        cell,
@@ -504,10 +504,10 @@ class ExcellentLibrary:
                        trim=False):
         """Reads the data from the given cell.
 
-        For an explanation of how to identify a cell, please see the secion
+        For an explanation of how to identify a cell, please see the section
         *Identifying a cell* at the top.
 
-        The ``cell_obj`` argument can be used to pass a OpenPyXL Cell object
+        The ``cell_obj`` argument can be used to pass an OpenPyXL Cell object
         to read from.
         """
         sheet = self.active_workbook.active
@@ -532,12 +532,12 @@ class ExcellentLibrary:
 
         This keyword can output the sheet data in two formats:
             - _As a list of dictionaries_. In the case column names are
-            supplied or obtained (see relevant parameters decribed below),
+            supplied or obtained (see relevant parameters described below),
             the rows will be represented through dictionaries, of which the
             keys will be the column names.
             - _As a list of lists_. If no column names are provided or
             obtained, each row will be read from the sheet as a list, and
-            the returned data will therefore be a list of all such lists.
+            the returned data will, therefore, be a list of all such lists.
 
         To use column names the following two parameters can be used.
 
@@ -628,8 +628,8 @@ class ExcellentLibrary:
         Only when you choose to make the changes persistent by calling this
         keyword, those changes will be written to disk.
         """
-        filepath = self.workbooks[self.active_workbook_alias]["filepath"]
-        self.active_workbook.save(filepath)
+        file_path = self.workbooks[self.active_workbook_alias]["file_path"]
+        self.active_workbook.save(file_path)
 
     def switch_sheet(self, sheet_name):
         """Switches to the sheet with the supplied name within the active
@@ -661,12 +661,13 @@ class ExcellentLibrary:
                       cell,
                       value,
                       number_format=None):
-        """Writes value to the supplied cell.
+        """Writes a value to the supplied cell.
 
-        For an explanation of how to identify a cell, please see the secion
+        For an explanation of how to identify a cell, please see the section
         *Identifying a cell* at the top.
 
-        For the use of ``number_format``, please read the secion *Writing data to sheets*.
+        For the use of ``number_format``, please read the section
+        *Writing data to sheets*.
         """
         sheet = self.active_workbook.active
         row_nr, col_nr = self._resolve_cell_coordinates(cell)

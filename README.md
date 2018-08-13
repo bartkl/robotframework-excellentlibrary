@@ -10,7 +10,10 @@ To install, simply use pip:
 pip install robotframework-excellentlibrary
 ```
 
-Dependencies are automatically installed. As soon as installation has succeeded, you can import the library in Robot Framework:
+Dependencies are automatically installed.
+
+## Importing in Robot Framework
+As soon as installation has succeeded, you can import the library in Robot Framework:
 
 ```robot
 *** Settings ***

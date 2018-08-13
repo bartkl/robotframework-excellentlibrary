@@ -66,7 +66,7 @@ Reading cells while switching sheets
 
 Opening several workbooks and switching between them
     Open workbook  ${PROPER EXCEL FILE}  alias=first excel file
-    Open workbook  ${WEIRD EXCEL FILE}  alias=second excel file
+    Open workbook  ${WEIRD EXCEL FILE}  second excel file
     Switch workbook  first excel file
     Switch sheet  Sheet 2 (no header)
     ${a1}=  Read from cell  A1
@@ -130,7 +130,7 @@ Read entire sheet with column names from header row (trimmed)
     @{data sheet}=  Read sheet data  get_column_names_from_header_row=${TRUE}  trim=${TRUE}
     :FOR  ${row}  IN  @{data sheet}
     \  Log dictionary  ${row}
-    Log opened workbooks  to_console=${TRUE}
+    Log opened workbooks
     Close workbook  ${PROPER EXCEL FILE}
 
 Read entire sheet with column names from list

@@ -83,198 +83,8 @@ class ExcellentLibrary:
     not support.
 
     = Usage =
-
-    == Workbooks ==
-    === Opening and switching ===
-    To open an Excel file (workbook), use `Open workbook`. You can open
-    several workbooks simultaneously, between which you can switch with
-    `Switch workbook`. For example:
-
-    | ${some workbook} =   |  Some file.xlsx   |
-    | Open workbook        |  ${some workbook} |
-    | Switch workbook      |  ${some workbook} |
-
-    After opening a workbook, it will also be made the active workbook. So if
-    for some reason you wish to open a workbook but not switch to it, you have
-    to manually switch to the workbook you wish to be working on.
-
-    Note that whenever you try to open a workbook that's already opened, you
-    will get a warning pointing that out to you. It won't be reopened, but it
-    will be made the active workbook.
-
-    === Creating ===
-    To create a new Excel file (workbook), you can use the `Create workbook`
-    keyword. An example should clarify its use:
-
-    | ${new workbook} =   | New file.xlsx   |
-    | Create workbook     | ${new workbook} |  # It saves to file too! |
-
-    === Saving ===
-    Whenever you've made it any change to the workbook, you yourself must
-    call `Save` to save the changes to the file like so:
-
-    | Save |  # Saves changes to the current workbook to disk. |
-
-    An exception to this rule is the `Create workbook` keyword, which performs
-    the save itself.
-
-    *Caution*: There may be other exceptions depending on the implementation
-    in _OpenPyXL_.
-
-    == Sheets ==
-
-    === Switching between them ===
-    You can switch between sheets by identifying them by their name as follows:
-
-    | Switch sheet      |  Orders  |  # Acts on active workbook. |
-
-    Note that if each workbook has its own active sheet, so whenever you switch
-    between workbooks they all keep track of their own active sheet:
-
-    | Open workbook     |  Debit.xlsx    |
-    | Switch sheet      |  Orders        |
-    | Open workbook     |  Credit.xlsx   |  # Switches to this workbook too!  |
-    | Switch sheet      |  People        |
-    | Switch workbook   |  Debit1.xlsx   |  # Active sheet is still *Orders*. |
-
-
-    === Creating sheets ===
-    To create a new sheet in the active workbook, simply use
-    `Create sheet`. For example:
-
-    | Create sheet    |  New sheet                |
-    |  Save           |  # Don't forget to save!  |
-
-    Don't forget to save your changes to the workbook as soon as you're done.
-
-    Whenever a sheet with the given name already exists an
-    ``SheetExistsAlreadyException`` is raised.
-
-    == Data ==
-    === Reading and identifying a cell ===
-    Several keywords, including `Write To Cell` and `Read From Cell` require
-    you to identify the cell with which you wish to interact. Basically, there
-    are two ways to choose from:
-    - _A1 notation_, provided through the ``cell`` parameter.\
-    This is the well-known shorthand notation which numbers\
-    the columns _A_, _B_, _C_, ... and the rows 1, 2, 3, ...\
-    For example, _B4_ will refer to row 4, column 2.
-    - _Row/column coordinates_, provided through the ``row_nr`` and\
-    ``col_nr`` parameters.\
-    This is exactly what you'd expect: the row and column numbers\
-    (starting from 1) of the cell you want to interact with.
-
-    _NOTE_: Since ``cell`` is the first named argument, you can simply pass in
-    the value without having to mention the parameter name.
-
-    *Examples*:
-
-    | ${no what}    | Read From Cell |          |              |          | # Bad |
-    | Write To Cell | Hi.            | B1       |              |          | # OK  |
-    | Write To Cell | Hi again.      | cell=D1  |              |          | # OK  |
-    | ${what}       | Read From Cell | row_nr=1 | col_nr=2     |          | # OK  |
-    | ${no what}    | Read From Cell | row_nr=1 |              |          | # Bad |
-    | Write To Cell | Hello          | cell=D1  | row_nr=1     | col_nr=4 | # Bad |
-
-    If desired one can trim the surrounding whitespace of a cell value by
-    passing ``trim=${TRUE}``. By default, no trimming is applied. For example:
-    
-    | ${trimmed}    | Read From Cell | A2       | trim=${TRUE} |          | # OK  |
-
-    === Writing data to sheets ===
-    To write plaintext data to a cell, the following straight-forward use of
-    `Write To Cell` keyword will do:
-
-    | Write To Cell | Hello   | B1       | # OK |
-
-    See *Identifying a cell* for more information on cell identification. Here
-    I will stick with the A1 notation.
-
-    It is possible to format the cell using the ``number_format`` parameter.
-    In order for this to work properly with the data you're writing, you must
-    make sure that the data type of the latter is compatible with what the
-    number formatting expects. For example, to format a cell as a number
-    that's rounded to two decimals, one should write data of a type number. To
-    format a cell to hold a date-time value, a Python date-time object should 
-    be passed in for it to function.
-
-    Some examples:
-    | Write To Cell | Hello      | B1 |                           | # OK  |
-    | Write To Cell | ${2}       | B1 |                           | # OK  |
-    | Write to cell | 1.233      | A1 | number_format=#.#         | # Bad |
-    | Write to cell | ${1.233}   | A1 | number_format=#.#         | # OK  |
-    | Write to cell | 2018-04-01 | C1 | number_format=yyyy-dd-mm  | # Bad |
-    | ${now}        | DateTime.Get current date | |               |       |
-    | Write to cell | ${now}     | D1 | number_format=yyyy-dd-mm  | # OK  |
-    | Write to cell | ${now}     | D1 | number_format=jjjj-dd-mm  | # Bad |
-
-    _NOTE_: The ``numer_format`` parameter seems to assume the US locale, so
-    make sure to delimit numbers with dots ("."), and format your dates using
-    ``yyyy`` for example rather than ``jjjj`` (Dutch). Excel will honour your
-    own locale settings anyways, so don't worry about it.
-
-    The OpenPyXL documentation is quite immature, so if you really need to
-    understand the implementation better you are forced to experiment or
-    read the source code.
-
-    ===  Reading cells ===
-    Reading cells is easy:
-
-    | ${value} | Read From Cell   | B1       | # OK |
-
-    See *Identiying a cell* for more information on cell identification. Here
-    I will stick with the A1 notation.
-
-    _NOTE_: This respects the number format of the cell, so reading a cell
-    with, for example, number format ``#.#`` will yield a value of type number
-    in Robot Framework.
-
-    _@TODO_: The ``Workbook`` object has a ``guess_types`` boolean which can
-    be used to manipulate this datatype inferring behaviour when reading
-    cells. This should be looked into.
-
-    === Reading the entire sheet ===
-    When you're dealing with reasonable amounts of data, it can be useful to
-    read all the data in a sheet to a list and work with that object in Robot
-    Framework. For this use the ``Read sheet data`` keyword.
-
-    Its parameters are documented extensively in the keyword documentation, so
-    make sure to read that. Here an example will be shown:
-
-    | Open Workbook | ${CURDIR}${/}..${/}Data${/}Orders.xlsx          |
-    | @{sheet}      | Read Sheet Data                                 |
-    | ...           |     get_column_names_from_header_row=${TRUE}    |
-    | ...           |     skip_first_row=${TRUE}                      |
-    | :FOR | ${row}  | IN  | @{sheet}                                 |
-    | \  |  ${order id}        | Set variable  &{row}[OrderID]        |
-    | \  |  ${price}           | Set variable  &{row}[Price]          |
-
-    Here the keys of the ``&{row}`` dictionary correspond to the column names
-    as fetched from header row, which was instructed by the
-    ``get_column_names_from_header_row`` parameter.
-
-    Here's an example without column names:
-
-    | @{sheet}                 | Read Sheet Data                       |
-    | :FOR | ${row}            | IN  | @{sheet}                        |
-    | \    |  Log list  ${row} |                                       |
-
-    === Using the row iterator ===
-    Use the `Get Row Iterator` keyword to obtain an iterator object which can
-    be used to iterate over all the rows. Only use this if the use case is
-    advanced and truly requires it. It's technically somewhat harder and
-    to use and generally leads to less readable code.
-
-    = Exceptions =
-    - ``ExcellentLibraryException``: Base exception; non-functional.
-    - ``ExcelFileNotFoundException``: The supplied file could not be found.
-    - ``InvalidCellCoordinatesException``: The provided coordinates were\
-    incomplete or invalid. See *Identifying a cell*.
-    - ``UnopenedWorkbookException``: The workbook you were trying to use is\
-    nog among the opened ones. Please make sure to open a workbook before\
-    trying to use it.
-    - ``SheetExistsAlreadyException``: A new sheet is attempted to be created,\
-    but a sheet with the supplied title already exists.
+    *TODO*: Showcase one full-feature, gigantic test suite covering pretty much
+    all functionality and variety one could possibly encounter.
     """
 
 
@@ -405,13 +215,10 @@ class ExcellentLibrary:
         """Closes the workbook identified by the supplied alias.
         
         If no alias is provided, the alias of the active workbook
-        is used.
+        is used. In this case a new workbook becomes active.
 
         Changes made to the file won't be saved automatically.
         Use the `Save` keyword to save the changes to the file.
-
-        If the file specified is the active workbook, then a new
-        workbook becomes active.
         """
         if not alias:
             alias = self.active_workbook_alias
@@ -457,7 +264,7 @@ class ExcellentLibrary:
 
         _NOTE_: It is advised to supply an absolute path to avoid confusion.
 
-        Example:
+        Examples:
 
         |  Create workbook  | H:\\Workbook 1.xlsx  |  # `alias` defaults to absolute file path  |
         |  Create workbook  | H:\\Workbook 2.xlsx  |  alias=second workbook                     |
@@ -496,6 +303,12 @@ class ExcellentLibrary:
 
     def log_opened_workbooks(self, to_log=True, to_console=False):
         """Logs the dictionary in which the opened workbooks are kept.
+
+        If ``to_log`` is ``True``, this keyword outputs in the log file.
+
+        If ``to_console`` is ``True``, this keyword outputs on the console.
+
+        Note that it is perfectly fine to log to both the log file and console simultaneously.
         """
         if to_log:
             logger.info(self.workbooks)
@@ -504,7 +317,7 @@ class ExcellentLibrary:
 
     def open_workbook(self, file_path, alias=None):
         """Opens the workbook found at the given file path.
-        _NOTE_: Please note that at present _xls_ files are not supported.
+        _NOTE_: Please note that at present _XLS_ files are not supported.
 
         The file will be added to the internal dictionary of opened workbooks
         using the supplied alias. If no alias is supplied, it will default to
@@ -611,7 +424,7 @@ class ExcellentLibrary:
 
         Use ``cell_range`` if you want to get data from only that range in the
         sheet, rather than all of the data in it. The expected input form is in
-        _A1 Notation_. For example: ``A1:B3".
+        _A1 Notation_. For example: ``A1:B3``.
 
         If ``trim`` is ``True``, all cell values are trimmed, i.e. the
         surrounding whitespace is removed.
@@ -634,18 +447,7 @@ class ExcellentLibrary:
         |  \               |  Log dictionary        |  ${row}                 |                 |
         |  Close workbook  |                        |                         |                 |
     
-
-
-    Open workbook  ${PROPER EXCEL FILE}  first excel file
-    Switch sheet  Sheet 1 (with header)
-    @{data sheet}=  Read sheet data  get_column_names_from_header_row=${TRUE}  trim=${TRUE}
-    :FOR  ${row}  IN  @{data sheet}
-    \  Log dictionary  ${row}
-    Close workbook
-
-        For more examples see the included test suite.
-
-
+        For more examples check out the included test suite.
         """
         sheet = self.active_workbook.active
         skip_first_row = False
@@ -740,6 +542,16 @@ class ExcellentLibrary:
         _NOTE_: You can only switch to workbooks which are opened. This
         keyword won't do that for you, so make sure you've opened the
         workbook you want to switch to using `Open workbook`.
+
+        Examples:
+
+        |  Opening several workbooks and switching between them  |
+        |  Open workbook   |  ${PROPER EXCEL FILE}  |  alias=first excel file  |  # supply alias with or without `alias=`: both is fine |
+        |  Open workbook   |  ${WEIRD EXCEL FILE}   |  second excel file       |  # when opening a workbook it is made the active one   |
+        |  Switch workbook |  first excel file      |                          |                                                        |
+        |  Switch sheet    |  Sheet 2 (no header)   |                          |                                                        |
+        |  Close workbook  alias=first excel file   |                          |                                                        |
+        |  Close workbook  alias=second excel file  |                          |                                                        |
         """
         try:
             self._set_new_active_workbook(alias)
@@ -752,11 +564,39 @@ class ExcellentLibrary:
                       number_format=None):
         """Writes a value to the supplied cell.
 
-        For an explanation of how to identify a cell, please see the section
-        *Identifying a cell* at the top.
+        For an explanation of how to identify a cell, please see the `Read From Cell` keyword documentation.
+        For the sake of convenience I will stick with A1 Notation.
 
-        For the use of ``number_format``, please read the section
-        *Writing data to sheets*.
+        Writing a value to a cell, then, is really straight-forward:
+
+        | Write To Cell | Hello   | B1       | # this is ok! |
+
+        It is possible to format the cell using the ``number_format`` parameter.
+        In order for this to work properly with the data you're writing, you must
+        make sure that the data type of the latter is compatible with what the
+        number formatting expects. For example, to format a cell as a number
+        that's rounded to two decimals, one should write data of a type number. To
+        format a cell to hold a date-time value, a Python date-time object should 
+        be passed in for it to function.
+
+        Some examples:
+        | Write To Cell | Hello      | B1 |                           | # OK  |
+        | Write To Cell | ${2}       | B1 |                           | # OK  |
+        | Write to cell | 1.233      | A1 | number_format=#.#         | # Bad |
+        | Write to cell | ${1.233}   | A1 | number_format=#.#         | # OK  |
+        | Write to cell | 2018-04-01 | C1 | number_format=yyyy-dd-mm  | # Bad |
+        | ${now}        | DateTime.Get current date | |               |       |
+        | Write to cell | ${now}     | D1 | number_format=yyyy-dd-mm  | # OK  |
+        | Write to cell | ${now}     | D1 | number_format=jjjj-dd-mm  | # Bad |
+
+        _NOTE_: The ``numer_format`` parameter seems to assume the US locale, so
+        make sure to delimit numbers with dots ("."), and format your dates using
+        ``yyyy`` for example rather than ``jjjj`` (in Dutch). Excel will honour your
+        own locale settings anyways, so don't worry about it.
+
+        The OpenPyXL documentation is quite immature, so if you really need to
+        understand the implementation better you are forced to experiment or
+        read the source code.
         """
         sheet = self.active_workbook.active
         row_nr, col_nr = self._resolve_cell_coordinates(cell)

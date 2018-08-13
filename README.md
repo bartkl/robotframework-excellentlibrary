@@ -2,7 +2,7 @@
 This library is built on top of OpenPyXL in order to bring its functionality to Robot Framework. The major motivation for this was to add support for Excel 2010 (XSLX) files, which ExcelLibrary does not support. It's important to note that this library does not support the older _xls_ files.
 
 ## Installation
-ExcellentLibrary can be found on PyPI: https://pypi.org/project/robotframework-excellentlibrary/.
+ExcellentLibrary can be found on PyPI: https://pypi.org/project/robotframework-excellentlibrary.
 
 To install, simply use pip:
 

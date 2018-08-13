@@ -125,12 +125,13 @@ Create and remove new sheet
     Close workbook
 
 Read entire sheet with column names from header row (trimmed)
-    Open workbook  ${PROPER EXCEL FILE}  first excel file
+    Open workbook  ${PROPER EXCEL FILE}
     Switch sheet  Sheet 1 (with header)
     @{data sheet}=  Read sheet data  get_column_names_from_header_row=${TRUE}  trim=${TRUE}
     :FOR  ${row}  IN  @{data sheet}
     \  Log dictionary  ${row}
-    Close workbook
+    Log opened workbooks  to_console=${TRUE}
+    Close workbook  ${PROPER EXCEL FILE}
 
 Read entire sheet with column names from list
     Open workbook  ${PROPER EXCEL FILE}  first excel file
@@ -152,7 +153,7 @@ Read entire sheet without column names
     \  Log list  ${row}
     Close workbook
 
-Read entire sheet with column names from header row
+Read sheet range with column names from header row
     Open workbook  ${PROPER EXCEL FILE}  first excel file
     Switch sheet  Sheet 1 (with header)
     @{data sheet}=  Read sheet data  cell_range=A1:B3  get_column_names_from_header_row=${TRUE}

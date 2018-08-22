@@ -438,7 +438,7 @@ class ExcellentLibrary:
 
         Examples:
 
-        |  Read entire sheet with column names from header row ||                                    |                 |
+        |  Read entire sheet with column names from header row  |  |                                 |                 |
         |  Open workbook   |  ${PROPER EXCEL FILE}  |  # no alias provided: defaulting to file path  |                 |
         |  Switch sheet    |  Sheet 1 (with header) |                                                |                 |
         |  @{data sheet}=  |  Read sheet data       |  get_column_names_from_header_row=${TRUE}      |                 |
@@ -446,7 +446,7 @@ class ExcellentLibrary:
         |  \               |  Log list              |  ${row}                                        |                 |
         |  Close workbook  |  ${PROPER EXCEL FILE}  |                                                |                 |
 
-        |  Read sheet range without column names (trimmed) ||                 |                 |
+        |  Read sheet range without column names (trimmed) | |                |                 |
         |  Open workbook   |  ${PROPER EXCEL FILE}  |  first excel file       |                 |
         |  Switch sheet    |  Sheet 1 (with header) |                         |                 |
         |  @{data sheet}=  |  Read sheet data       |  cell_range=A1:B3       |  trim=${TRUE}   |

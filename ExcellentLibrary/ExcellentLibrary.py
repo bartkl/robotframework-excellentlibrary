@@ -85,10 +85,14 @@ class ExcellentLibrary:
     = Usage =
     *TODO*: Showcase one full-feature, gigantic test suite covering pretty much
     all functionality and variety one could possibly encounter.
+
+    The OpenPyXL documentation is quite immature, so if you really need to
+    understand the implementation better you are forced to experiment or
+    read the source code.
     """
 
 
-    __version__ = '0.9'
+    __version__ = '0.9.1'
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 
     def __init__(self):
@@ -207,6 +211,9 @@ class ExcellentLibrary:
 
     def close_all_workbooks(self):
         """Closes all opened workbooks.
+
+        Changes made to the file won't be saved automatically.
+        Use the `Save` keyword to save the changes to the file.
         """
         for alias in self.workbooks.keys():
             self.close_workbook(alias)
@@ -239,17 +246,17 @@ class ExcellentLibrary:
             logger.warning("Cannot close workbook with alias `{}': workbook "
                             "not opened.".format(alias))
 
-    def create_sheet(self, name):
+    def create_sheet(self, sheet_name):
         """Creates a sheet in the active workbook.
 
         The ``name`` parameter must be used to supply the name of the sheet.
         If the sheet already exists, a ``SheetAlreadyExistsException`` is
         raised.
         """
-        if not name in self.active_workbook.sheetnames:
-            self.active_workbook.create_sheet(title=name)
+        if not sheet_name in self.active_workbook.sheetnames:
+            self.active_workbook.create_sheet(title=sheet_name)
         else:
-            raise SheetExistsAlreadyException(name)
+            raise SheetExistsAlreadyException(sheet_name)
 
     def create_workbook(self, file_path, overwrite_file_if_exists=False, alias=None):
         """Creates a new workbook and saves it to the given file path.
@@ -321,7 +328,7 @@ class ExcellentLibrary:
 
         The file will be added to the internal dictionary of opened workbooks
         using the supplied alias. If no alias is supplied, it will default to
-        the file path.
+        the file path. The opened workbook will also be made the active workbook.
 
         The ``file_path`` parameter should point to the location of the file on
         the filesystem. It is advisable to make this an absolute path to avoid
@@ -499,7 +506,7 @@ class ExcellentLibrary:
 
         return sheet_data
 
-    def remove_sheet(self, name):
+    def remove_sheet(self, sheet_name):
         """Removes the sheet identified by its name from the active workbook.
 
         The ``name`` parameter must be used to supply the name of the sheet.
@@ -507,9 +514,9 @@ class ExcellentLibrary:
         raised.
         """
         try: 
-            del self.active_workbook[name]
+            del self.active_workbook[sheet_name]
         except KeyError:
-            raise SheetNotFoundException(name)        
+            raise SheetNotFoundException(sheet_name)
 
     def save(self):
         """Saves the changes to the currently active workbook.
@@ -534,9 +541,7 @@ class ExcellentLibrary:
         self.active_workbook.active = index
 
     def switch_workbook(self, alias):
-        """Switches between opened workbooks.
-
-        Switches to the workbook identified by ``alias``, i.e. make
+        """Switches to the workbook identified by ``alias``, i.e. make
         that the active workbook.
 
         _NOTE_: You can only switch to workbooks which are opened. This
@@ -569,7 +574,7 @@ class ExcellentLibrary:
 
         Writing a value to a cell, then, is really straight-forward:
 
-        | Write To Cell | Hello   | B1       | # this is ok! |
+        | Write To Cell | B1   | Hello       | # this is ok! |
 
         It is possible to format the cell using the ``number_format`` parameter.
         In order for this to work properly with the data you're writing, you must
@@ -580,23 +585,19 @@ class ExcellentLibrary:
         be passed in for it to function.
 
         Some examples:
-        | Write To Cell | Hello      | B1 |                           | # OK  |
-        | Write To Cell | ${2}       | B1 |                           | # OK  |
-        | Write to cell | 1.233      | A1 | number_format=#.#         | # Bad |
-        | Write to cell | ${1.233}   | A1 | number_format=#.#         | # OK  |
-        | Write to cell | 2018-04-01 | C1 | number_format=yyyy-dd-mm  | # Bad |
-        | ${now}        | DateTime.Get current date | |               |       |
-        | Write to cell | ${now}     | D1 | number_format=yyyy-dd-mm  | # OK  |
-        | Write to cell | ${now}     | D1 | number_format=jjjj-dd-mm  | # Bad |
+        | Write To Cell | B1 | Hello      |                           | # OK  |
+        | Write To Cell | B1 | ${2}       |                           | # OK  |
+        | Write to cell | A1 | 1.233      | number_format=#.#         | # Bad |
+        | Write to cell | A1 | ${1.233}   | number_format=#.#         | # OK  |
+        | Write to cell | C1 | 2018-04-01 | number_format=yyyy-dd-mm  | # Bad |
+        | ${now}        | DateTime.Get current date |       |         |       |
+        | Write to cell | D1  | ${now}    |  number_format=yyyy-dd-mm | # OK  |
+        | Write to cell | D1$ | {now}     |  number_format=jjjj-dd-mm | # Bad |
 
         _NOTE_: The ``numer_format`` parameter seems to assume the US locale, so
         make sure to delimit numbers with dots ("."), and format your dates using
         ``yyyy`` for example rather than ``jjjj`` (in Dutch). Excel will honour your
         own locale settings anyways, so don't worry about it.
-
-        The OpenPyXL documentation is quite immature, so if you really need to
-        understand the implementation better you are forced to experiment or
-        read the source code.
         """
         sheet = self.active_workbook.active
         row_nr, col_nr = self._resolve_cell_coordinates(cell)

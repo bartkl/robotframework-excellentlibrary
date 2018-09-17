@@ -322,7 +322,7 @@ class ExcellentLibrary:
         if to_console:
             logger.console(self.workbooks)
 
-    def open_workbook(self, file_path, alias=None):
+    def open_workbook(self, file_path, alias=None, keep_vba=False):
         """Opens the workbook found at the given file path.
         _NOTE_: Please note that at present _XLS_ files are not supported.
 
@@ -334,22 +334,27 @@ class ExcellentLibrary:
         the filesystem. It is advisable to make this an absolute path to avoid
         confusion.
 
+        The ``alias`` can be used to give a more practical name to your workbook,
+        which comes in handy when working with several opened workbooks simultaneously.
+
+        If the file you want to open contains VBA (macros), please pass ``keep_vba=${TRUE}``
+        in order to preserve the VBA code.
+
         *Warning*: make sure to explicitly switch to the sheet you want to
         work with by using the `Switch sheet` keyword. Contrary to expectations,
         the active sheet by default is not necessarily the first one in tab-order.
 
         Examples:
-
-        |  Open workbook  |  H:\\Data\\Wb1.xlsx  |  alias=wb1               |  # alias with explicit named parameter: ok  |
-        |  Open workbook  |  H:\\Data\\Wb2.xlsx  |  wb2                     |  # or alias as positional parameter: ok  |
-        |  # Now `Wb2.xlsx` is the active workbook. |                     | |
-        |  Open workbook  |  H:\\Data\\Wb3.xlsx  |  |  # no alias provided, alias defauls to file path  |
-        |  Switch workbook  |  first excel file  |  |  # now `wb1` is the active workbook |
-        |  Close workbook  |  first excel file   |  |  # now `wb1` is closed and `wb2` is set to be the active workbook |
+        |  Open workbook                            |  H:\\Data\\Wb1.xlsx           |                       |                   |  # now _Wb1.xlsx_ is the active workbook  |
+        |  Open workbook                            |  H:\\Data\\Wb2.xlsx           |  alias=wb2            |                   |  # Now _Wb2.xlsx_ is the active workbook. |
+        |  Switch workbook                          |  H:\\Data\\Wb1.xlsx           |                       |                   |  # now _Wb1.xlsx_ is the active workbook  |
+        |  Close workbook                           |  wb2                          |                       |                   |  # now _wb2_ is closed and _Wb1.xlsx_ is set to be the active workbook |
+        |  Close workbook                           |                               |                       |                   |  # now _Wb1.xlsx_ is closed because it was the active workbook |
+        |  Open workbook                            |  H:\\Data\\WbWithMacro.xlsx   |  alias=Macro Workbook |  keep_vba=${TRUE} |  # Macro's are preserved and properly saved on `Save`  | 
 
         """
         try:
-            workbook = openpyxl.load_workbook(file_path)
+            workbook = openpyxl.load_workbook(file_path, keep_vba=keep_vba)
         except IOError as e:
             if e.errno == errno.ENOENT:
                 raise ExcelFileNotFoundException(file_path)

@@ -21,4 +21,6 @@ Library  ExcellentLibrary
 ```
 
 ## Keyword documentation
-For the keyword documentation [go here](https://bartkl.github.io/ExcellentLibrary.html).
+For the latest keyword documentation [go here](https://bartkl.github.io/robotframework-excellentlibrary/documentation/ExcellentLibrary.html).
+
+If you're using an older version of the library and want to view the appropriate keyword documentation, please open the HTML file locally, or download it from GitHub. It can be found as _ExcellentLibrary.html_ in the _documentation_ directory of the project.

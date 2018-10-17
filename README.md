@@ -21,4 +21,4 @@ Library  ExcellentLibrary
 ```
 
 ## Keyword documentation
-For the keyword documentation [go here](documentation/ExcellentLibrary.html).
+For the keyword documentation [go here](https://bartkl.github.io/robotframework-excellentlibrary/documentation/ExcellentLibrary.html).

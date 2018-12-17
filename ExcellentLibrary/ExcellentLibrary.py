@@ -92,7 +92,7 @@ class ExcellentLibrary:
     """
 
 
-    __version__ = '0.9.2'
+    __version__ = '0.9.3'
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 
     def __init__(self):
@@ -523,16 +523,30 @@ class ExcellentLibrary:
         except KeyError:
             raise SheetNotFoundException(sheet_name)
 
-    def save(self):
+    def save(self, reopen_after_save=False):
         """Saves the changes to the currently active workbook.
 
         _NOTE_: When manipulating sheets/cells, you are working with
         object representations in memory, not the factual data on disk.
         Only when you choose to make the changes persistent by calling this
         keyword, will those changes be saved to the file.
+
+        If the `reopen_after_save` parameter is `True` the workbook will be
+        closed and then opened again after being saved. This parameter's sole
+        purpose is to serve as a workaround for the corruption of
+        macro-enabled workbooks with comments when saving more than once.
+        (see: OpenPyXL Bitbucket issue 861)
         """
         file_path = self.workbooks[self.active_workbook_alias]["file_path"]
         self.active_workbook.save(file_path)
+        if reopen_after_save:
+            self.close_workbook()
+            self.open_workbook(file_path, keep_vba=True)  # The workaround is
+                                                          # meant to solve the
+                                                          # bug with macro
+                                                          # enabled workbooks,
+                                                          # so `keep_vba=True`
+                                                          # is fine.
 
     def switch_sheet(self, sheet_name):
         """Switches to the sheet with the supplied name within the active

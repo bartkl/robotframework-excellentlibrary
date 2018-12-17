@@ -533,8 +533,9 @@ class ExcellentLibrary:
 
         If the `reopen_after_save` parameter is `True` the workbook will be
         closed and then opened again after being saved. This parameter's sole
-        purpose is to serve a workaround for the double-saving macro-enabled
-        workbooks with comments (see: OpenPyXL Bitbucket issue 861).
+        purpose is to serve as a workaround for the corruption of
+        macro-enabled workbooks with comments when saving more than once.
+        (see: OpenPyXL Bitbucket issue 861)
         """
         file_path = self.workbooks[self.active_workbook_alias]["file_path"]
         self.active_workbook.save(file_path)

@@ -139,7 +139,7 @@ class ExcellentLibrary:
         """Gets the alias of the workbook identified by the supplied
         file path.
         """
-        for alias, workbook_entry in self.workbooks.iteritems():
+        for alias, workbook_entry in self.workbooks.items():
             if workbook_entry["file_path"] == file_path:
                 return alias
 
@@ -239,7 +239,8 @@ class ExcellentLibrary:
             self._remove_from_workbooks(alias)
 
             if set_new_active_workbook and len(self.workbooks) > 0:
-                new_alias = self.workbooks.keys()[0]
+                print(self.workbooks.keys())
+                new_alias = list(self.workbooks.keys())[0]
                 self._set_new_active_workbook(new_alias)
 
         except KeyError:
@@ -497,7 +498,7 @@ class ExcellentLibrary:
                     except IndexError:
                         raise TooFewColumnNamesSuppliedException
 
-                if not all(value is None for value in row_data.itervalues()):
+                if not all(value is None for value in row_data.values()):
                     sheet_data.append(row_data)
         else:
             sheet_data = []
